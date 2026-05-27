@@ -1,0 +1,8 @@
+[package]
+name = "zk_project"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+halo2_proofs = { version = "0.3.2" }
+halo2curves = { version = "0.10.0", features = ["bn256-table"] }

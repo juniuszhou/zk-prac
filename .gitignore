@@ -1,0 +1,16 @@
+node_modules/
+artifacts/
+artifacts-pvm/
+cache/
+cache-pvm/
+coverage/
+typechain-types/
+
+# Hardhat Ignition deployment history can include environment-specific data.
+ignition/deployments/
+
+# Local secrets.
+.env
+
+# Generated proving artifacts. Keep circuit source and docs in git; regenerate these.
+build/
