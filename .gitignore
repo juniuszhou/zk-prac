@@ -6,6 +6,8 @@ cache-pvm/
 coverage/
 typechain-types/
 
+halo/target
+
 # Hardhat Ignition deployment history can include environment-specific data.
 ignition/deployments/
 
