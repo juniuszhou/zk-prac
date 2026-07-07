@@ -29,3 +29,10 @@ Trusted Setup 过程中，系统会生成一些秘密随机数（称为 toxic wa
 Circom 使用它主要是因为在“链上验证成本”这个维度上，Groth16 目前仍然是性价比最高的选择，尤其适合需要频繁在区块链上验证证明的场景。
 
 Circom 也可以使用plonk
+
+## circom to solidity
+
+在 Circom 生态中，你根本不需要手工去写 Solidity 验证代码。社区提供了一套完全成熟的、一键式命令工具，可以直接基于你编译出来的 Circom 电路约束（.zkey / 约束工件），全自动吐出一个生产环境可用的 Solidity 智能合约（通常命名为 verifier.sol）。
+
+snarkjs zkey export solidityverifier your_circuit_final.zkey verifier.sol
+
