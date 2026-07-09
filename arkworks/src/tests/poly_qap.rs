@@ -61,6 +61,7 @@ fn test_r1cs_to_qap() {
     //      5: sym_2         (Witness(3))
     // ---------------------------------------------------------------
     let cs = ConstraintSystem::<Fr>::new_ref();
+
     let three = Fr::from(3u8);
     let five = Fr::from(5u8);
     let nine = Fr::from(9u8);
@@ -113,7 +114,9 @@ fn test_r1cs_to_qap() {
     // ---------------------------------------------------------------
     // 2. Extract R1CS sparse matrices  (Vec<Vec<(coeff, col_idx)>>)
     // ---------------------------------------------------------------
+    // it is the result of all constraints enforced, and the matrices are in sparse form.
     let matrices = cs.to_matrices().expect("matrices constructed");
+
     let m = matrices.num_constraints; // number of constraints (rows)
     let num_instance = matrices.num_instance_variables; // includes ONE
     let num_witness = matrices.num_witness_variables;
@@ -134,6 +137,7 @@ fn test_r1cs_to_qap() {
     let mut b_dense = vec![vec![Fr::zero(); n]; m];
     let mut c_dense = vec![vec![Fr::zero(); n]; m];
 
+    // to dense format.
     for (i, row) in matrices.a.iter().enumerate() {
         for &(coeff, col) in row {
             a_dense[i][col] = coeff;
