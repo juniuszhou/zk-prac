@@ -1,9 +1,44 @@
 use ark_ec::pairing::Pairing;
 use ark_ec::{CurveGroup, Group};
-use ark_ff::{Field, PrimeField};
+use ark_ff::{FftField, Field, PrimeField};
 use ark_std::{One, UniformRand, Zero};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
+
+fn type_of<T>(_: &T) -> &'static str {
+    std::any::type_name::<T>()
+}
+
+#[test]
+fn test_basic_bn254() {
+    let a: ark_bn254::Fr = ark_bn254::Fr::from(2u64);
+    let b: ark_bn254::Fr = ark_bn254::Fr::from(3u64);
+    let c = a + b;
+
+    let d: ark_bn254::Fq = ark_bn254::Fq::from(2u64);
+    assert_eq!(c, ark_bn254::Fr::from(5u64));
+
+    // can not compare Fr and Fq directly
+    // assert_eq!(a, d);
+
+    // they are just value, so we can compare their bigints
+    assert_eq!(a.into_bigint(), d.into_bigint());
+
+    let g1 = <ark_bn254::G1Projective>::generator();
+    let p: ark_bn254::G1Projective = g1 * <ark_bn254::Fr>::from(5u64);
+    // (x y z) structure
+    println!("p = {:?}", p);
+    // x and y in Fq, or (x, y) in affine coordinates
+    // (x, y) is a point on the curve of elliptic curve, and z is the projective coordinate
+    // curve equation: y² = x³ + ax + b, where a and b are curve parameters
+    // it is y² = x³ + 3, so a = 0, b = 3 for BN254 curve
+    println!("p as affine = {:?}", p.into_affine());
+
+    let q = p.into_affine();
+    println!("q.x() = {:?}", type_of(&q.x));
+    println!("q.x() = {:?}", q.x.into_bigint());
+    println!("q.y() = {:?}", q.y.into_bigint());
+}
 
 // ─── BN254 ───────────────────────────────────────────────────────────────
 
@@ -101,6 +136,7 @@ fn test_bls12_381() {
     let g1 = <ark_bls12_381::G1Projective>::generator();
     assert!(!g1.is_zero());
     let g1_aff: ark_bls12_381::G1Affine = g1.into();
+
     assert!(g1_aff.is_on_curve());
     assert!(g1_aff.is_in_correct_subgroup_assuming_on_curve());
     let p: ark_bls12_381::G1Projective = g1 * <ark_bls12_381::Fr>::from(5u64);
@@ -137,4 +173,76 @@ fn test_bls12_381() {
     assert_eq!(multi, expected);
     println!("  ✓ Pairing (bilinearity + non-degeneracy + multi-pairing)");
     println!();
+}
+
+#[test]
+fn test_fq_usage() {
+    let mut rng = StdRng::seed_from_u64(42);
+    println!("── test_fq_usage (BLS12-381 Fq) ──");
+
+    // 1. Fq: the base field — coordinates of G1 live here
+    type Fq = ark_bls12_381::Fq;
+    type Fr = ark_bls12_381::Fr;
+    type G1 = ark_bls12_381::G1Projective;
+
+    let a: Fq = UniformRand::rand(&mut rng);
+    let b: Fq = UniformRand::rand(&mut rng);
+    println!("  a = {a}");
+    println!("  b = {b}");
+
+    // Arithmetic — same Field trait
+    assert_eq!(a + Fq::zero(), a);
+    assert_eq!(a * Fq::one(), a);
+    let _sum = a + b; // works: a + b ∈ Fq
+    let _prod = a * b; // works: a * b ∈ Fq
+    let inv = a.inverse().unwrap();
+    assert_eq!(a * inv, Fq::one());
+    assert_eq!(
+        (a + b).square(),
+        a.square() + Fq::from(2u64) * a * b + b.square()
+    );
+    println!("  ✓ +, -, *, /, square");
+
+    // 2. Fq vs Fr — totally different primes
+    println!(
+        "  Fq bit-width = {} bits, Fr bit-width = {} bits",
+        Fq::MODULUS_BIT_SIZE,
+        Fr::MODULUS_BIT_SIZE
+    );
+    assert_ne!(
+        Fq::MODULUS_BIT_SIZE,
+        Fr::MODULUS_BIT_SIZE,
+        "Fq and Fr are different fields"
+    );
+
+    // 3. Fq can NOT be used as scalar for G1 — only Fr works
+    let g = G1::generator();
+    // g * a  ← type error: can't multiply by Fq
+
+    // But Fq *IS* the coordinate type for G1 affine points
+    let g_aff: ark_bls12_381::G1Affine = g.into_affine();
+    let _x: Fq = g_aff.x; // x coordinate in Fq
+    let _y: Fq = g_aff.y; // y coordinate in Fq
+    println!("  ✓ G1Affine stores coordinates as Fq");
+
+    // 4. Fq has 2-adicity for FFT (over the *base* field)
+    let two_adic = <Fq as FftField>::TWO_ADICITY;
+    assert!(two_adic > 0);
+    let root = <Fq as FftField>::TWO_ADIC_ROOT_OF_UNITY;
+    assert!(root.pow(&[1u64 << two_adic]) == Fq::one());
+    println!("  ✓ Fq 2-adicity = {two_adic}, root-of-unity works");
+
+    // 5. Construct Fq from integer / bytes
+    let five = Fq::from(5u64);
+    let from_bytes = Fq::from_le_bytes_mod_order(&5u64.to_le_bytes());
+    assert_eq!(five, from_bytes);
+
+    // 6. Legendre symbol / quadratic residue
+    // In Fq, half the elements are squares (QR), half are non-squares (QNR)
+    let _legendre = a.legendre(); // returns LegendreSymbol
+    let a_sqrt = a.sqrt(); // Some if QR, None if QNR
+    if let Some(s) = a_sqrt {
+        assert_eq!(s.square(), a, "sqrt² = a");
+    }
+    println!("  ✓ legendre() and sqrt()");
 }

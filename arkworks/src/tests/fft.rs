@@ -60,7 +60,9 @@ fn test_fft_roundtrip() {
         let n = 1 << log_n;
         let omega = <Fr as FftField>::get_root_of_unity(n).unwrap();
 
+        // generate random coefficients
         let coeffs: Vec<Fr> = (0..n).map(|_| Fr::rand(&mut rng)).collect();
+        // perform FFT and then IFFT
         let evals = fft(&coeffs, omega);
         let recovered = ifft(&evals, omega);
 
