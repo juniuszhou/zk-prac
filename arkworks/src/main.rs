@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests;
 
+mod custom_field;
 mod mini_zk;
 
 fn main() {
