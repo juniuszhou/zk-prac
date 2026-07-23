@@ -19,3 +19,4 @@ ark-std.workspace = true
 ark-test-curves.workspace = true
 num-bigint = "0.4"
 rand = "0.8.5"
+sha2 = "0.10"

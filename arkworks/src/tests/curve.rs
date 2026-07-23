@@ -26,6 +26,9 @@ fn test_basic_bn254() {
 
     let g1 = <ark_bn254::G1Projective>::generator();
     let p: ark_bn254::G1Projective = g1 * <ark_bn254::Fr>::from(5u64);
+
+    // can not multiply G1 by Fq
+    // let p2: ark_bn254::G1Projective = <ark_bn254::Fr>::from(5u64) * g1;
     // (x y z) structure
     println!("p = {:?}", p);
     // x and y in Fq, or (x, y) in affine coordinates
