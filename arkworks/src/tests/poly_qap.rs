@@ -159,6 +159,17 @@ fn test_r1cs_to_qap() {
     //    For each column j, interpolate A_j, B_j, C_j so that
     //      A_j(ω^i) = A[i][j],  same for B, C,  for all rows i.
     // ---------------------------------------------------------------
+    /*
+    找到一个 m, m需要向2^n 取整 阶单位根 ω
+
+    构造 {1,ω,ω2,ω3}
+
+    提供 fft 和 ifft 接口
+
+    interpolate 是针对每一列的系数，给定 m 个点的值，返回一个多项式，使得这个多项式在这些点上取到这些值。
+    其实也可以使用IFFT来做插值，给定 m 个点的值，使用 IFFT 可以得到多项式的系数。
+    select some values for evaluation points, and then interpolate the polynomial that passes through those points.
+     */
     let domain_sz = m.next_power_of_two();
     let domain = Radix2EvaluationDomain::<Fr>::new(domain_sz)
         .expect("domain must be constructible (check 2-adicity of Fr)");

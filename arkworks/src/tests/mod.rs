@@ -4,6 +4,7 @@ mod fft;
 mod finite_field;
 mod gate;
 mod groth16;
+mod groth_setup;
 mod mimc;
 mod plonk;
 mod poly_commit;
