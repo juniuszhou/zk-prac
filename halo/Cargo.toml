@@ -1,8 +1,23 @@
 [package]
-name = "zk_project"
+name = "halo_example"
 version = "0.1.0"
 edition = "2021"
+
+[lib]
+name = "halo_gate"
+path = "src/add.rs"
+
+[[bin]]
+name = "halo_add_demo"
+path = "src/bin/halo_add_demo.rs"
+
+[[bin]]
+name = "show_qap"
+path = "src/bin/show_qap.rs"
 
 [dependencies]
 halo2_proofs = { version = "0.3.2" }
 halo2curves = { version = "0.10.0", features = ["bn256-table"] }
+rand_core = "0.6"
+serde_json = "1"
+group = "0.13"
