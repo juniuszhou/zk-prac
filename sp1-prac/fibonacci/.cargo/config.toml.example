@@ -1,0 +1,8 @@
+# Copy to .cargo/config.toml if `cargo check` fails with:
+#   sp1-recursion-gnark-ffi: Failed to build Go library ... NotFound
+#
+#   cp .cargo/config.toml.example .cargo/config.toml
+# Then edit the Go path if your install is not at ~/go/bin.
+
+[env]
+PATH = { value = "/home/junius/go/bin:/home/junius/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", force = true }
