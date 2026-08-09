@@ -1,11 +1,14 @@
 mod curve;
+mod custom_field;
 mod e2e;
 mod fft;
 mod finite_field;
+mod fri;
 mod gate;
 mod groth16;
 mod groth_setup;
 mod mimc;
+mod mle;
 mod plonk;
 mod poly_commit;
 mod poly_qap;

@@ -1,5 +1,5 @@
-mod custom_field;
+pub mod custom_field;
 pub use custom_field::*;
 // mod expand;
 // pub use expand::*;
-mod mini_kzg;
+pub mod mini_kzg;

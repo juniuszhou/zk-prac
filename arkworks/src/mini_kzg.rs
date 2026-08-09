@@ -100,16 +100,16 @@ fn commit(crs: &KZGCRS, poly: &DensePolynomial<Fr>) -> Commitment {
 }
 
 // ============================================================================
-// KZG Prove — 证明 p(z) = v
+// KZG Prove — 证明 p(z) = v . choose z according to challenge rule and give v as result
 // ============================================================================
 //
 // 1. 合成除法计算 q(x) = (p(x) - v) / (x - z)
 //    使用 Horner 方法，从最高次系数开始
 // 2. π = g^{q(τ)} = commit(q)
-
+// Proof is a point in G1, same as Commitment
 fn prove(crs: &KZGCRS, poly: &DensePolynomial<Fr>, z: Fr, v: Fr) -> Proof {
     // 多项式除法: (p(x) - v) / (x - z) = q(x)
-    let q_poly = divide_by_linear(poly, z, v);
+    let q_poly: DensePolynomial<Fr> = divide_by_linear(poly, z, v);
     Proof(commit(crs, &q_poly).0)
 }
 
@@ -123,7 +123,7 @@ fn divide_by_linear(poly: &DensePolynomial<Fr>, z: Fr, v: Fr) -> DensePolynomial
     let coeffs = &poly.coeffs;
     let n = coeffs.len();
     let mut q_coeffs = Vec::with_capacity(n - 1);
-    let mut carry = coeffs[n - 1]; // a_n
+    let mut carry: Fr = coeffs[n - 1]; // a_n
     for i in (1..n).rev() {
         q_coeffs.push(carry); // b_{i-1} = carry
         carry = coeffs[i - 1] + carry * z; // carry = a_{i-1} + z·b_{i-1}

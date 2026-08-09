@@ -48,3 +48,27 @@ const G_Y: Fq = MontFp!("2");
 
 pub type MyAffine = Affine<MyCurveConfig>;
 pub type MyProjective = Projective<MyCurveConfig>;
+
+// ── A small user-facing field wrapper ───────────────────────────────
+// `CustomField` wraps the scalar field `Fr` (F_13) and exposes the tiny
+// subset of operations the test suite needs, so callers never have to deal
+// with `Fr` (F_13) internals directly. All arithmetic is delegated to the
+// arkworks field implementation.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct CustomField(pub Fr);
+
+impl From<u64> for CustomField {
+    /// Lift an integer into `F_13` (e.g. `CustomField::from(2u64)`).
+    fn from(v: u64) -> Self {
+        CustomField(Fr::from(v))
+    }
+}
+
+impl std::ops::Add for CustomField {
+    type Output = CustomField;
+
+    /// Add two field elements modulo the (prime) characteristic.
+    fn add(self, rhs: Self) -> Self::Output {
+        CustomField(self.0 + rhs.0)
+    }
+}

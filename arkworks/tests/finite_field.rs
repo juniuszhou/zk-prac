@@ -1,10 +1,11 @@
-use crate::custom_field::{Fq, Fr, MyProjective};
+// The custom F_7 / F_13 fields defined in src/custom_field.rs
+// (mod 7 arithmetic is what the asserts below rely on).
 use ark_ec::{CurveGroup, Group};
 use ark_ff::{FftField, Field, One, PrimeField, Zero};
 use ark_std::UniformRand;
+use arkworks::custom_field::{Fq, Fr, MyProjective};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
-
 #[test]
 fn test_fq_arithmetic() {
     let a = Fq::from(3_u64);
